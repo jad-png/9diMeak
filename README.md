@@ -1,4 +1,4 @@
-parcel-management/
+9diMeak/
 ├── Dockerfile                              # Docker Image Configuration
 ├── docker-compose.yml                      # Container Orchestration (App + DB + n8n)
 ├── pom.xml                                 # Maven Dependencies
