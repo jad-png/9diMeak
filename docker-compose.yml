@@ -1,4 +1,8 @@
 services:
+
+  # ==========================================
+  # 1. SPRING BOOT APPLICATION
+  # ==========================================
   app:
     container_name: spring_app
     build: .
@@ -6,31 +10,29 @@ services:
       - "${SPRING_PORT}:8080"
     env_file:
       - .env
-    # The app service depends on the mongodb service being ready and healthy
     depends_on:
       mongodb:
         condition: service_healthy
     networks:
       - app_network
 
+  # ==========================================
+  # 2. MONGODB DATABASE
+  # ==========================================
   mongodb:
-    # Using the official Mongo 7 image
     image: mongo:7
     container_name: mongo_db
     env_file:
       - .env
-    # Set root credentials using environment variables from .env file
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
     ports:
       - "27017:27017"
-    # CORRECTED: Referencing the volume as 'mongo-data' to match the top-level definition
     volumes:
       - mongo-data:/data/db
     networks:
       - app_network
-    # Healthcheck to ensure the database is fully initialized before the application starts
     healthcheck:
       test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
       interval: 10s
@@ -38,9 +40,29 @@ services:
       retries: 5
       start_period: 40s
 
+  # ==========================================
+  # 3. JENKINS (CI/CD)
+  # ==========================================
+  jenkins:
+    container_name: 9dimeak_jenkins
+    build:
+      context: .
+      dockerfile: Dockerfile.jenkins
+    user: root
+    ports:
+      - "${JENKINS_PORT}:8080"
+      - "${JENKINS_AGENT_PORT}:50000"
+    env_file:
+      - .env
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+      - maven_data:/root/.m2
+    networks:
+      - app_network
+    restart: unless-stopped
 
 volumes:
-  # This globally defined volume is now correctly referenced by the service
   mongo-data:
 
 networks:
