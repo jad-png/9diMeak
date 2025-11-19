@@ -64,6 +64,8 @@ services:
 
 volumes:
   mongo-data:
+  jenkins_home:
+  maven_data:
 
 networks:
   app_network:
