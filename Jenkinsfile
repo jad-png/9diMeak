@@ -31,7 +31,7 @@ pipeline {
                 checkout scm
             }
         }
-
+// TODO: exclude usseless files
         stage('Test & Verify') {
             when {
                 anyof {
