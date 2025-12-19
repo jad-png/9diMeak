@@ -1,6 +1,6 @@
 package com.PCM._diMeak.model.enums;
 
-public enum Speciality {
+public enum Specialty {
     STANDARD,
     FRAGILE,
     FRIGO
